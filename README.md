@@ -255,3 +255,15 @@ mealie-mcp/
 ## License
 
 MIT
+
+---
+
+## OpenCode port
+
+This fork also runs under [OpenCode](https://opencode.ai): the same 27-tool MCP
+server, four of the five skills (without the family-specific dietary rules) and
+three commands. See [`opencode/README.md`](opencode/README.md).
+
+Client paths are patched for Mealie v3.29 (`api/groups/*` → `api/households/*`,
+`api/recipes/create-url` → `api/recipes/create/url`); the diff lives in
+[`patch/mealie-routes-v3.29.patch`](patch/mealie-routes-v3.29.patch).

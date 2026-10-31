@@ -66,7 +66,7 @@ class MealieClient:
 
     async def create_recipe_from_url(self, url: str) -> str:
         result = await self._request(
-            "POST", "/api/recipes/create-url", json={"url": url, "includeTags": True}
+            "POST", "/api/recipes/create/url", json={"url": url, "includeTags": True}
         )
         return result
 
@@ -83,19 +83,19 @@ class MealieClient:
 
     async def get_shopping_lists(self) -> dict:
         return await self._request(
-            "GET", "/api/groups/shopping/lists", params={"page": 1, "perPage": -1}
+            "GET", "/api/households/shopping/lists", params={"page": 1, "perPage": -1}
         )
 
     async def get_shopping_list(self, list_id: str) -> dict:
-        return await self._request("GET", f"/api/groups/shopping/lists/{list_id}")
+        return await self._request("GET", f"/api/households/shopping/lists/{list_id}")
 
     async def create_shopping_list(self, name: str) -> dict:
         return await self._request(
-            "POST", "/api/groups/shopping/lists", json={"name": name}
+            "POST", "/api/households/shopping/lists", json={"name": name}
         )
 
     async def delete_shopping_list(self, list_id: str) -> None:
-        await self._request("DELETE", f"/api/groups/shopping/lists/{list_id}")
+        await self._request("DELETE", f"/api/households/shopping/lists/{list_id}")
 
     async def add_shopping_list_item(
         self,
@@ -118,25 +118,25 @@ class MealieClient:
         if food_id:
             body["foodId"] = food_id
         return await self._request(
-            "POST", "/api/groups/shopping/items", json=body
+            "POST", "/api/households/shopping/items", json=body
         )
 
     async def update_shopping_list_item(
         self, item_id: str, data: dict
     ) -> dict:
         return await self._request(
-            "PUT", f"/api/groups/shopping/items/{item_id}", json=data
+            "PUT", f"/api/households/shopping/items/{item_id}", json=data
         )
 
     async def delete_shopping_list_item(self, item_id: str) -> None:
-        await self._request("DELETE", f"/api/groups/shopping/items/{item_id}")
+        await self._request("DELETE", f"/api/households/shopping/items/{item_id}")
 
     async def add_recipe_ingredients_to_list(
         self, list_id: str, recipe_id: str
     ) -> dict:
         return await self._request(
             "POST",
-            f"/api/groups/shopping/lists/{list_id}/recipe/{recipe_id}",
+            f"/api/households/shopping/lists/{list_id}/recipe/{recipe_id}",
         )
 
     # ── Meal Plans ───────────────────────────────────────────
@@ -144,15 +144,15 @@ class MealieClient:
     async def get_meal_plans(self, start_date: str, end_date: str) -> dict:
         return await self._request(
             "GET",
-            "/api/groups/mealplans",
+            "/api/households/mealplans",
             params={"start_date": start_date, "end_date": end_date, "perPage": -1},
         )
 
     async def create_meal_plan_entry(self, data: dict) -> dict:
-        return await self._request("POST", "/api/groups/mealplans", json=data)
+        return await self._request("POST", "/api/households/mealplans", json=data)
 
     async def delete_meal_plan_entry(self, entry_id: str) -> None:
-        await self._request("DELETE", f"/api/groups/mealplans/{entry_id}")
+        await self._request("DELETE", f"/api/households/mealplans/{entry_id}")
 
     async def get_random_recipes(self, count: int = 7) -> list[dict]:
         resp = await self._request(
@@ -184,14 +184,14 @@ class MealieClient:
 
     async def get_cookbooks(self) -> dict:
         return await self._request(
-            "GET", "/api/groups/cookbooks", params={"perPage": -1}
+            "GET", "/api/households/cookbooks", params={"perPage": -1}
         )
 
     async def get_cookbook_recipes(
         self, cookbook_slug: str, page: int = 1, per_page: int = 10
     ) -> dict:
         cookbook = await self._request(
-            "GET", f"/api/groups/cookbooks/{cookbook_slug}"
+            "GET", f"/api/households/cookbooks/{cookbook_slug}"
         )
         # Cookbooks filter by categories/tags; use those to query recipes
         params: dict[str, Any] = {"page": page, "perPage": per_page}

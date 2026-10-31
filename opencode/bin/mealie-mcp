@@ -1,0 +1,24 @@
+#!/bin/sh
+# Lance le serveur MCP mealie-mcp pour OpenCode.
+#
+# Identifiants, par ordre de priorité :
+#   1. MEALIE_URL / MEALIE_API_KEY déjà présents dans l'environnement
+#   2. sinon, fichier .env à côté de ce script (clés MEALIE_URL / MEALIE_API_KEY
+#      ou MEALIE_BASE_URL / MEALIE_API_TOKEN)
+set -eu
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+if [ -z "${MEALIE_API_KEY:-}" ] && [ -f "$HERE/.env" ]; then
+  set -a
+  . "$HERE/.env"
+  set +a
+fi
+export MEALIE_URL="${MEALIE_URL:-${MEALIE_BASE_URL:-}}"
+export MEALIE_API_KEY="${MEALIE_API_KEY:-${MEALIE_API_TOKEN:-}}"
+
+if [ -z "$MEALIE_URL" ] || [ -z "$MEALIE_API_KEY" ]; then
+  echo "mealie-mcp: MEALIE_URL et MEALIE_API_KEY sont requis" >&2
+  exit 1
+fi
+
+exec uv run --python 3.13 --directory "$HERE/.." mealie-mcp
