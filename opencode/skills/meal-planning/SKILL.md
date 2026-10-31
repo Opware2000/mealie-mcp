@@ -2,6 +2,8 @@
 name: meal-planning
 description: This skill should be used when the user asks to "plan meals for the week", "what should we eat this week", "weekly menu", "meal plan", "plan dinners for the week", "plan the week", "fill in the meal plan", "what's for dinner this week", "help me plan meals", "set up the meal plan for [dates]", or wants to use Mealie's meal planning feature to organize a week of family meals.
 version: 1.0.0
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Meal Planning

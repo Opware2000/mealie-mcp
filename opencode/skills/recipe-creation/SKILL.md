@@ -2,6 +2,8 @@
 name: recipe-creation
 description: This skill should be used when the user asks to "create a recipe", "add a recipe to Mealie", "write a recipe for [dish]", "add [dish name] to Mealie", "make a new recipe", "I want to save a recipe", "build a recipe", "put this recipe in Mealie", or provides recipe details and wants them saved. Covers the full workflow for authoring structured recipes against the Mealie v3 API with user preferences.
 version: 1.0.0
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Recipe Creation
@@ -28,7 +30,7 @@ Collect the following, asking the user only for what they haven't already provid
 |-------|-----------|-------|
 | Name | `name` | Required |
 | Description | `description` | One-sentence summary |
-| Servings | `servings` | Numeric; default 6 |
+| Servings | `servings` | Numeric — ask the user, no default |
 | Yield text | `recipe_yield` | e.g., "6 servings", "1 loaf", "15–18 rolls" |
 | Total time | `total_time` | e.g., "1 hour 30 minutes" |
 | Prep time | `prep_time` | e.g., "20 minutes" |

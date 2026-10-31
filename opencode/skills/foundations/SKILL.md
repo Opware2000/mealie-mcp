@@ -2,6 +2,8 @@
 name: foundations
 description: This skill should be used when the user asks to "create a foundation recipe", "write a foundation for [dish]", "foundation recipe", "the why behind the how", "educational recipe", "teaching recipe", "mark as foundation", "isFoundation", "technique foundation", "document why this works", or wants to create a recipe that teaches the underlying science and technique rather than just listing steps. Foundation recipes are a special category that explain cooking principles alongside procedures.
 version: 1.0.0
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Foundation Recipe Authoring

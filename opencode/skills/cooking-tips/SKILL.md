@@ -2,6 +2,8 @@
 name: cooking-tips
 description: This skill should be used when the user asks "how do I cook [technique]", "cooking tips for [dish]", "what's the best way to [method]", "homesteading cooking", "from scratch cooking", "how to braise", "how to make stock", "bone broth tips", "sourdough tips", "fermentation tips", "how do I render fat", "tallow rendering", "how to season cast iron", "how to make ghee", "bread baking tips", "what is the Maillard reaction", "why sear meat", "how to develop fond", or any question about cooking technique, food science, or scratch cooking methods.
 version: 1.0.0
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Cooking Tips and Techniques
