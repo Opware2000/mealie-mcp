@@ -6,6 +6,8 @@ metadata:
   opencode/autoinvoke: false
 ---
 
+> OpenCode exposes these tools as `tools.mealie.<tool>` (Code Mode). Names below are the tool part only.
+
 # Meal Planning
 
 Build weekly meal plans in Mealie using the family's recipe library, protein rotation philosophy, and batch cooking strategy.

@@ -6,6 +6,8 @@ metadata:
   opencode/autoinvoke: false
 ---
 
+> OpenCode exposes these tools as `tools.mealie.<tool>` (Code Mode). Names below are the tool part only.
+
 # Recipe Creation
 
 Create well-structured recipes in Mealie using the MCP server tools, following the user's stated preferences and the Mealie v3 data format.

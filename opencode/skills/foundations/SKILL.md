@@ -6,6 +6,8 @@ metadata:
   opencode/autoinvoke: false
 ---
 
+> OpenCode exposes these tools as `tools.mealie.<tool>` (Code Mode). Names below are the tool part only.
+
 # Foundation Recipe Authoring
 
 Foundation recipes are the intellectual core of this family's Mealie library — structured differently from ordinary recipes because they teach the **why behind the how**. A Foundation doesn't just say "sear the beef." It explains what the Maillard reaction is, why surface dryness matters, what fond is, and why skipping this step produces a fundamentally different dish.
