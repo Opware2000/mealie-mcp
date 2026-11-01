@@ -1,142 +1,121 @@
-# Mealie Plugin for Claude Code
+# Mealie MCP for OpenCode
 
-A Claude Code plugin that bundles a full-featured Mealie MCP server (27 tools) with skills, agents, and commands for family-centered recipe management, homesteading cooking guidance, and dietary compliance.
+An [OpenCode](https://opencode.ai) port of the [Thrivewell Partners Mealie MCP
+server](https://github.com/thrivewell-partners/mealie-mcp): a 27-tool MCP server
+for the [Mealie](https://mealie.io/) recipe manager, plus four skills and three
+commands that let you search recipes, plan the week, and fill shopping lists
+from a conversation.
 
-> Maintained by [Thrivewell Partners](https://github.com/thrivewell-partners)
+This is a **fork**, not an original project. The MCP server, its tool set, the
+skills, and the commands were written by Thrivewell Partners; see
+[Credits](#credits).
+
+The server code is unchanged. What changed is the packaging: Claude Code plugin
+manifests, hooks, and agents are dropped, MCP tool names in prose are plain
+(`search_recipes` → `tools.mealie.search_recipes`), and the family-specific
+dietary rules are removed.
+
+Full French guide: [`opencode/USAGE.md`](opencode/USAGE.md). Port summary:
+[`opencode/README.md`](opencode/README.md).
 
 ---
 
 ## Features
 
-- **27-tool MCP server** — Direct access to Mealie's recipes, shopping lists, meal plans, organizers, foods, and units
-- **5 Claude Code skills** — Auto-activating knowledge libraries for recipe creation, Foundation recipes, dietary management, cooking tips, and meal planning
-- **3 intelligent agents** — Recipe advisor, meal planner, and cooking teacher — auto-triggered on relevant conversations
-- **3 slash commands** — `/mealie:quick-recipe`, `/mealie:weekly-menu`, `/mealie:find-recipe`
-- **Dietary guardrail hook** — Scans ingredients for pork products and seed oils before any recipe is saved to Mealie
-- **Family-aware defaults** — Serves 6, mild heat, no pork, no seed oils throughout all components
+- **27-tool MCP server** — recipes, shopping lists, meal plans, organizers, foods, units
+- **4 skills** — recipe creation, Foundation recipes, cooking techniques, meal planning
+- **3 commands** — `/mealie/find`, `/mealie/weekly-menu`, `/mealie/quick-recipe`
+- **Delete guard** — `permissions` denies `delete_recipe`, `delete_shopping_list`, `delete_meal_plan_entry`
+- **Mealie v3.29 routes** — the client is patched for current Mealie (see below)
 
 ---
 
-## Installation
+## Install
 
-### As a Claude Code Plugin (Recommended)
+**1. Clone and install**
 
-**1. Add the Marketplace**
-```bash
-/plugin marketplace add https://github.com/thrivewell-partners/mealie-mcp
-```
-
-**2. Install the Plugin**
-```bash
-/plugin install mealie@thrivewell-marketplace
-```
-
-**3. Set Environment Variables**
-```bash
-export MEALIE_URL="https://your-mealie-instance.com"
-export MEALIE_API_KEY="your-api-token"
-```
-
-Get your API token: Mealie UI → User Profile → API Tokens → Generate
-
-**4. Restart Claude Code** — MCP server and hooks load on startup.
-
----
-
-### Standalone MCP Server (Advanced / Development)
-
-**1. Install**
-```bash
-git clone https://github.com/thrivewell-partners/mealie-mcp
+```sh
+git clone https://github.com/<you>/mealie-mcp
 cd mealie-mcp
-uv pip install -e .
+uv sync --python 3.13
 ```
 
-**2. Configure**
-```bash
-# Create .env file with your Mealie credentials
-echo "MEALIE_URL=https://your-mealie-instance.com" > .env
-echo "MEALIE_API_KEY=your-api-token" >> .env
+**2. Add your Mealie credentials**
+
+Create `.env` in `opencode/` (read by the launcher):
+
+```sh
+MEALIE_URL=https://mealie.example.com
+MEALIE_API_KEY=<token from Mealie → profile → API tokens>
 ```
 
-**3. Add to Claude Code MCP settings**
+**3. Configure OpenCode**
 
-In `.claude/settings.json` or your project's MCP config:
+Copy [`opencode/opencode.json.example`](opencode/opencode.json.example) into your
+project as `opencode.json` and replace the absolute path with your clone:
+
 ```json
 {
-  "mcpServers": {
-    "mealie": {
-      "command": "uv",
-      "args": ["run", "--directory", "/path/to/mealie-mcp", "mealie-mcp"],
-      "env": {
-        "MEALIE_URL": "https://your-mealie-instance.com",
-        "MEALIE_API_KEY": "your-api-token"
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "mealie": {
+        "type": "local",
+        "command": ["/absolute/path/to/mealie-mcp/opencode/bin/mealie-mcp"],
+        "timeout": { "startup": 60000, "catalog": 60000, "execution": 120000 }
       }
     }
-  }
+  },
+  "skills": ["./opencode/skills"],
+  "permissions": [
+    { "action": "mealie_delete_recipe", "resource": "*", "effect": "deny" },
+    { "action": "mealie_delete_shopping_list", "resource": "*", "effect": "deny" },
+    { "action": "mealie_delete_meal_plan_entry", "resource": "*", "effect": "deny" }
+  ]
 }
 ```
 
+**4. Add commands and skills to your project**
+
+```sh
+cp -r opencode/commands opencode/skills <project>/.opencode/
+```
+
+The `skills: ["./opencode/skills"]` entry above works too if you prefer to keep
+them in the clone.
+
+**5. Check the connection**
+
+```sh
+opencode mcp list     # ✓ mealie connected
+```
+
+The launcher reads `MEALIE_URL` / `MEALIE_API_KEY` from the environment first,
+then from `opencode/.env` (`MEALIE_BASE_URL` / `MEALIE_API_TOKEN` also accepted).
+
 ---
 
-## Plugin Components
-
-### Skills (Auto-Activated)
-
-Skills load automatically when you ask related questions — no command needed.
-
-| Skill | Trigger Phrases | Description |
-|-------|----------------|-------------|
-| `recipe-creation` | "add a recipe", "create a recipe for [dish]", "save this recipe to Mealie" | Structured Mealie v3 recipe authoring with family defaults |
-| `foundations` | "foundation recipe", "the why behind the how", "educational recipe" | Educational Foundation recipe paradigm with full technique documentation |
-| `dietary-management` | "check for dietary issues", "substitute the oil", "is this family-friendly" | Compliance checking, pork/seed-oil detection, substitution guidance |
-| `cooking-tips` | "how do I braise", "homesteading cooking", "what is fond", "how to render tallow" | Scratch cooking techniques with food science explanations |
-| `meal-planning` | "plan meals for the week", "weekly menu", "what should we eat" | Weekly meal planning via Mealie API |
-
-### Agents
-
-| Agent | Color | Triggers | Role |
-|-------|-------|---------|------|
-| `recipe-advisor` | Green | Recipe modification discussions, dietary evaluation, substitution requests | Read-only recipe consultant — evaluates and advises |
-| `meal-planner` | Blue | "Plan the week's meals", "fill in the meal plan", multi-day meal requests | Drafts weekly menus, gets approval, creates Mealie entries |
-| `cooking-teacher` | Cyan | "Teach me how to", technique questions, troubleshooting cooking failures | Explains the science and technique behind cooking methods |
-
-### Commands
+## Commands
 
 | Command | Usage | Description |
 |---------|-------|-------------|
-| `/mealie:quick-recipe` | `/mealie:quick-recipe [recipe name]` | Guided step-by-step recipe creation into Mealie |
-| `/mealie:weekly-menu` | `/mealie:weekly-menu [YYYY-MM-DD]` | Plan a week of dinners, get approval, create Mealie entries |
-| `/mealie:find-recipe` | `/mealie:find-recipe [query] [--tag name] [--category name]` | Search with dietary context and direct actions |
+| `/mealie/find` | `/mealie/find [query]` | Search, show detail, then offer to add to shopping list or meal plan |
+| `/mealie/weekly-menu` | `/mealie/weekly-menu [YYYY-MM-DD]` | Plan a week of dinners, show the table, wait for approval, then create entries |
+| `/mealie/quick-recipe` | `/mealie/quick-recipe [description]` | Build a structured Mealie v3 recipe, show the draft, wait for approval |
 
-### Dietary Guardrail Hook
+Commands answer in French.
 
-A `PreToolUse` hook fires before every `create_recipe` and `update_recipe` MCP call. It uses a Claude prompt to scan the ingredients list for:
+## Skills
 
-- **Pork products**: bacon, ham, lard, prosciutto, pork sausage, chorizo, carnitas, and all variants
-- **Seed oils**: canola, vegetable, sunflower, safflower, corn, soybean, cottonseed, grapeseed, rice bran oils
+Skills are loaded explicitly (`opencode/autoinvoke: false`) — invoke them or let
+OpenCode pick them up when the topic matches.
 
-If violations are found, Claude receives a warning with the specific ingredient names and suggested compliant alternatives. The operation is not blocked — Claude decides whether to correct and retry or proceed.
-
----
-
-## Family Dietary Guidelines
-
-These rules are enforced by all plugin components:
-
-### NO PORK
-No pork or pork-derived products. This includes: pork chops, bacon, ham, lard, prosciutto, pancetta, guanciale, salami, pepperoni, pork sausage, carnitas, pork ribs, pork belly, pork rinds, fatback.
-
-### NO SEED OILS
-No industrially extracted seed or vegetable oils. Forbidden: vegetable oil, canola oil, sunflower oil, safflower oil, corn oil, soybean oil, cottonseed oil, grapeseed oil, rice bran oil, margarine.
-
-**Compliant fats:** avocado oil · tallow · ghee · butter · olive oil · coconut oil · duck fat
-
-### SCALE FOR 6
-Default all recipes to serve 6 people. Numeric servings field enables Mealie's scaling feature.
-
-### MILD TO MODERATE HEAT
-Kid-friendly heat. Jalapeños seeded. No habaneros, scotch bonnets, or super-hot chilis.
+| Skill | Covers |
+|-------|--------|
+| `recipe-creation` | Structured Mealie v3 recipe authoring: categories, tags, units, foods, ingredients, instructions |
+| `foundations` | "Foundation recipe" paradigm — teaching the why behind a technique, not just the steps |
+| `cooking-tips` | Scratch cooking and food science: braising, stock, sourdough, fermentation, rendering fat, cast iron |
+| `meal-planning` | Weekly planning workflow against the Mealie meal plan API |
 
 ---
 
@@ -198,73 +177,77 @@ Kid-friendly heat. Jalapeños seeded. No habaneros, scotch bonnets, or super-hot
 
 ## Requirements
 
-- **Python 3.11+**
+- **Python 3.11+** (`pyproject.toml`); the launcher pins **3.13**
 - **[uv](https://docs.astral.sh/uv/)** package manager
-- **[Mealie](https://mealie.io/) v3.0+** — self-hosted recipe manager
-- **Claude Code** with plugin support
+- **[Mealie](https://mealie.io/) v3.29+** — self-hosted recipe manager
+- **[OpenCode](https://opencode.ai)** with MCP support
 
 ---
 
 ## Development
 
-### Run Tests
-```bash
+```sh
 uv run pytest
 ```
 
-### Project Structure
+### Project structure
+
 ```
 mealie-mcp/
-├── .claude-plugin/
-│   └── plugin.json              # Plugin manifest
-├── marketplace.json             # GitHub Marketplace directory
+├── opencode/
+│   ├── bin/mealie-mcp           # launcher: .env, pins Python 3.13, runs the server
+│   ├── commands/mealie/         # find, weekly-menu, quick-recipe
+│   ├── skills/                  # cooking-tips, foundations, meal-planning, recipe-creation
+│   ├── opencode.json.example    # MCP + skills + permissions, to copy into your project
+│   ├── README.md                # port summary
+│   └── USAGE.md                 # full guide (French)
 ├── src/mealie_mcp/              # MCP server source
 │   ├── server.py                # FastMCP app and tool registration
 │   ├── client.py                # Async Mealie API client (httpx)
 │   ├── config.py                # Pydantic settings (MEALIE_URL, MEALIE_API_KEY)
 │   ├── formatting.py            # Markdown output formatters
-│   └── tools/                   # Tool modules
-│       ├── recipes.py           # 7 recipe tools
-│       ├── shopping.py          # 8 shopping list tools
-│       ├── mealplan.py          # 4 meal plan tools
-│       ├── organizers.py        # 6 organizer tools
-│       └── foods.py             # 2 food/unit tools
-├── skills/                      # Claude Code skills
-│   ├── recipe-creation/         # Mealie v3 recipe authoring
-│   ├── foundations/             # Foundation recipe paradigm
-│   ├── dietary-management/      # Compliance and substitutions
-│   ├── cooking-tips/            # Homesteading techniques
-│   └── meal-planning/           # Weekly planning workflow
-├── agents/                      # Claude Code agents
-│   ├── recipe-advisor.md        # Recipe evaluation and adaptation
-│   ├── meal-planner.md          # Weekly meal planning
-│   └── cooking-teacher.md       # Technique education
-├── commands/                    # Slash commands
-│   ├── quick-recipe.md          # Guided recipe creation
-│   ├── weekly-menu.md           # Weekly meal plan
-│   └── find-recipe.md           # Recipe search
-├── hooks/
-│   └── hooks.json               # Dietary guardrail PreToolUse hook
-├── tests/                       # Test suite (pytest + respx)
-├── .mcp.json                    # MCP server config (env var references)
-└── pyproject.toml               # Python project metadata
+│   └── tools/                   # recipes (7), shopping (8), mealplan (4), organizers (6), foods (2)
+├── patch/
+│   └── mealie-routes-v3.29.patch
+├── tests/                       # pytest + respx
+└── pyproject.toml
 ```
 
----
+Upstream Claude Code packaging (`.claude-plugin/`, `agents/`, `hooks/`) is still
+in the tree but unused by the OpenCode setup. It is documented in
+[`CHANGELOG.md`](CHANGELOG.md).
+
+## Mealie v3.29 route fix
+
+`src/mealie_mcp/client.py` used pre-v3 paths that 404 on current Mealie:
+`/api/groups/{shopping,mealplans,cookbooks}` → `/api/households/…` and
+`/api/recipes/create-url` → `/api/recipes/create/url`. The diff lives in
+[`patch/mealie-routes-v3.29.patch`](patch/mealie-routes-v3.29.patch); apply it
+with `git apply` if you start from upstream.
+
+## Credits
+
+**Upstream — Thrivewell Partners**
+
+- Repository: <https://github.com/thrivewell-partners/mealie-mcp>
+- Author: Thrivewell Partners (<https://github.com/thrivewell-partners>)
+- Licensed MIT, © 2026 Thrivewell Partners
+
+Everything in `src/mealie_mcp/`, the 27 MCP tools, the skills, and the original
+commands come from that project. The `.claude-plugin/`, `agents/`, and `hooks/`
+directories are theirs too and are kept as-is.
+
+**This fork — Nicolas OGIER** (<https://github.com/Opware2000/mealie-mcp>)
+
+- OpenCode packaging: `opencode/` launcher, `opencode.json` template, ported
+  commands and skills, French documentation
+- Mealie v3.29 route fixes in `src/mealie_mcp/client.py`
+  (`patch/mealie-routes-v3.29.patch`)
+
+Both copyright notices are in [`LICENSE`](LICENSE). If you reuse this work,
+keep them.
 
 ## License
 
-MIT
-
----
-
-## OpenCode port
-
-This fork also runs under [OpenCode](https://opencode.ai): the same 27-tool MCP
-server, four of the five skills (without the family-specific dietary rules) and
-three commands. See [`opencode/USAGE.md`](opencode/USAGE.md) for the full guide (French),
-and [`opencode/README.md`](opencode/README.md) for the summary.
-
-Client paths are patched for Mealie v3.29 (`api/groups/*` → `api/households/*`,
-`api/recipes/create-url` → `api/recipes/create/url`); the diff lives in
-[`patch/mealie-routes-v3.29.patch`](patch/mealie-routes-v3.29.patch).
+MIT — see [`LICENSE`](LICENSE). Original work by
+[Thrivewell Partners](https://github.com/thrivewell-partners/mealie-mcp).
