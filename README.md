@@ -187,6 +187,7 @@ OpenCode pick them up when the topic matches.
 ## Development
 
 ```sh
+uv sync --extra dev
 uv run pytest
 ```
 
@@ -213,8 +214,10 @@ mealie-mcp/
 └── pyproject.toml
 ```
 
-Upstream Claude Code packaging (`.claude-plugin/`, `agents/`, `hooks/`) is still
-in the tree but unused by the OpenCode setup. It is documented in
+The upstream Claude Code packaging (`.claude-plugin/`, `agents/`, `hooks/`,
+`.mcp.json`, and the original `skills/`/`commands/` at the root) was removed —
+OpenCode has no equivalent and the ported copies live under `opencode/`. It
+remains in git history and in the upstream repository; see
 [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Mealie v3.29 route fix
@@ -234,8 +237,9 @@ with `git apply` if you start from upstream.
 - Licensed MIT, © 2026 Thrivewell Partners
 
 Everything in `src/mealie_mcp/`, the 27 MCP tools, the skills, and the original
-commands come from that project. The `.claude-plugin/`, `agents/`, and `hooks/`
-directories are theirs too and are kept as-is.
+commands come from that project. The `.claude-plugin/`, `agents/`, `hooks/` and
+`.mcp.json` files were also theirs; they were removed from this fork (git
+history and the upstream repository still have them).
 
 **This fork — Nicolas OGIER** (<https://github.com/Opware2000/mealie-mcp>)
 

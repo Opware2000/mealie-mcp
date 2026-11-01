@@ -40,7 +40,7 @@ async def test_delete_recipe(client, mock_api):
 
 @pytest.mark.asyncio
 async def test_get_shopping_lists(client, mock_api, sample_shopping_list):
-    mock_api.get("/api/groups/shopping/lists").mock(
+    mock_api.get("/api/households/shopping/lists").mock(
         return_value=Response(200, json={"items": [sample_shopping_list]})
     )
     result = await client.get_shopping_lists()

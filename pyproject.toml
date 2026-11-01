@@ -1,6 +1,6 @@
 [project]
 name = "mealie-mcp"
-version = "0.1.0"
+version = "1.1.0"
 description = "MCP server for Mealie recipe manager"
 requires-python = ">=3.11"
 dependencies = [

@@ -51,7 +51,7 @@ keep the skills in the clone instead of copying them.
 
 | Upstream | Here |
 | --- | --- |
-| `.claude-plugin/`, `agents/`, `hooks/` | dropped — OpenCode has no plugin hooks for MCP tool calls |
+| `.claude-plugin/`, `agents/`, `hooks/`, `.mcp.json` | dropped — OpenCode has no plugin hooks for MCP tool calls |
 | 5 skills, including `dietary-management` | 4 skills — the family-specific one is removed, the rest are neutralised |
 | `mcp__plugin_mealie_mealie__<tool>` in prose | `<tool>` — OpenCode exposes them as `tools.mealie.<tool>` |
 | Tool allow-lists in command frontmatter | dropped — OpenCode commands only carry `description`/`agent`/`model` |

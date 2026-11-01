@@ -6,6 +6,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and sema
 
 ---
 
+## [1.1.0] — 2026-11-01
+
+### Added — OpenCode port
+
+- `opencode/` — launcher (`bin/mealie-mcp`), `opencode.json.example`, `README.md`, `USAGE.md` (French guide)
+- **Commands** ported to `/mealie/find`, `/mealie/weekly-menu`, `/mealie/quick-recipe` (frontmatter reduced to `description`)
+- **Skills** ported (4): `recipe-creation`, `foundations`, `cooking-tips`, `meal-planning` — loaded explicitly (`opencode/autoinvoke: false`)
+- `permissions` in the example config deny `delete_recipe`, `delete_shopping_list`, `delete_meal_plan_entry`
+
+### Fixed
+
+- Mealie v3.29 routes: `/api/groups/{shopping,mealplans,cookbooks}` → `/api/households/…`, `/api/recipes/create-url` → `/api/recipes/create/url` — see `patch/mealie-routes-v3.29.patch`
+
+### Removed
+
+- Claude Code plugin packaging: `.claude-plugin/`, `agents/`, `hooks/`, `.mcp.json`, and the root `skills/`/`commands/` superseded by their `opencode/` copies (including `dietary-management`, which encoded one family's rules)
+- These files remain available in git history and in the upstream repository
+
+### Documentation
+
+- `README.md` rewritten for OpenCode, with an explicit Credits section
+- `LICENSE` carries both copyright notices (Thrivewell Partners + fork author)
+
+---
+
 ## [1.0.0] — 2026-02-24
 
 ### Added — Claude Code Plugin

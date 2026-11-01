@@ -17,9 +17,11 @@ pour Mealie v3.29.
 | `opencode/opencode.json.example` | configuration MCP + skills + permissions à adapter |
 | `patch/mealie-routes-v3.29.patch` | correction des routes Mealie (déjà appliquée ici) |
 
-Ce qui n'a **pas** été porté depuis l'amont : le plugin Claude Code
-(`.claude-plugin/`, `agents/`, `hooks/`), le skill `dietary-management` et les
-règles familiales (pas de porc, pas d'huiles de graines, portions pour 6).
+Ce qui n'a **pas** été porté depuis l'amont, et qui a été supprimé ici : le
+plugin Claude Code (`.claude-plugin/`, `agents/`, `hooks/`, `.mcp.json`), le
+skill `dietary-management` et les règles familiales (pas de porc, pas d'huiles
+de graines, portions pour 6). Ces fichiers restent dans l'historique git et dans
+le dépôt amont.
 
 ---
 

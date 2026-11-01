@@ -11,7 +11,7 @@ def _get_text(result) -> str:
 
 @pytest.mark.asyncio
 async def test_get_shopping_lists_tool(client, mock_api, sample_shopping_list):
-    mock_api.get("/api/groups/shopping/lists").mock(
+    mock_api.get("/api/households/shopping/lists").mock(
         return_value=Response(200, json={"items": [sample_shopping_list]})
     )
 
@@ -26,7 +26,7 @@ async def test_get_shopping_lists_tool(client, mock_api, sample_shopping_list):
 
 @pytest.mark.asyncio
 async def test_get_shopping_list_detail(client, mock_api, sample_shopping_list):
-    mock_api.get("/api/groups/shopping/lists/list-001").mock(
+    mock_api.get("/api/households/shopping/lists/list-001").mock(
         return_value=Response(200, json=sample_shopping_list)
     )
 
@@ -42,7 +42,7 @@ async def test_get_shopping_list_detail(client, mock_api, sample_shopping_list):
 
 @pytest.mark.asyncio
 async def test_add_item_tool(client, mock_api):
-    mock_api.post("/api/groups/shopping/items").mock(
+    mock_api.post("/api/households/shopping/items").mock(
         return_value=Response(201, json={"id": "new-item-1", "note": "Eggs"})
     )
 
