@@ -4,6 +4,9 @@ This directory makes the Mealie MCP server usable from
 [OpenCode](https://opencode.ai) instead of Claude Code: the same server, the
 same skills (minus the Johnson family's dietary rules), and three commands.
 
+Full guide (installation, 27 tools, commands, skills, troubleshooting):
+[`USAGE.md`](USAGE.md) — in French.
+
 ```
 opencode/
 ├── bin/mealie-mcp            # launcher: reads .env, pins Python 3.13, runs the server
